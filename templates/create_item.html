@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block main %}
+<h3 style="margin-bottom: 1.5em;">Create new item</h3>
+<form action="{{url_for('create_item', category_id=category_id)}}" method="post" class="col-md-5" enctype="multipart/form-data">
+    <div class="form-group">
+        <input type="hidden" value="{{csrf_token}}" name="csrf_token" />
+        <label for="name">Name:</label><br/>
+        <input type="text" name="name" id="name" maxlength="80" value="{{item.name or ''}}" class="form-control" /><br/>
+        <label for="description">Description:</label><br/>
+        <textarea name="description" id="description" maxlength="500" cols="40" rows="5" class="form-control">{{item.description or ''}}</textarea><br/>
+        <label for="image_file">Image file (optional):</label><br/>
+        <input type="file" name="image_file" id="image_file" /><br/>
+        <label for="category">Category:</label>
+        <select class="form-control" name="category" id="category">
+            {% for category in category_summary %}
+                <option value="{{category.id}}" {% if category.id == category_id %}selected{% endif %}>{{category.name}}</option>
+            {% endfor %}
+        </select><br/>
+
+        <button type="submit" class="btn btn-primary">Create</button>
+        <a href="{{url_for('show_category', category_id=category_id)}}"><button type="button" class="btn btn-danger">Cancel</button></a>
+    </div>
+</form>
+{% endblock %}

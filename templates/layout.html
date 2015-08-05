@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Catalog App</title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/static/style.css" rel="stylesheet" />
+
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script>
+        function signInCallback(authResult) {
+            if (authResult['code']) {
+                $('#signinButton').attr('style', 'display: none');
+                $('#result').attr('style', 'display: block').html('Logging in...');
+                $.ajax({
+                    type: 'POST',
+                    url: '/gconnect?state={{STATE}}',
+                    processData: false,
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    data: authResult['code'],
+                    success: function(result) {
+                        if (result) {
+                            $('#result').html('Login successful! Redirecting...');
+
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 4000);
+                        }
+
+                        else if (authResult['error']) {
+                            console.log('There was an error: ' + authResult['error']);
+                        }
+                    },
+                    error: function() {
+                        $('#result').html('Login failed!');
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body style="padding-top: 70px">
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{url_for('show_categories')}}">Catalog App</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+
+        {% if user.logged_in %}
+            <li class="navbar-text"><img src="{{user.picture}}" class="picture_adjustment" /> {{user.username}}</li>
+            <li><a href="{{url_for('logout')}}">Logout</a></li>
+        {% else %}
+            <div id="signinButton" class="signin_button_adjustment">
+                <span class="g-signin"
+                      data-scope="profile email"
+                      data-clientid="665630610917-i2bgufbmluum5n6efun7vtcf4gurihdi.apps.googleusercontent.com"
+                      data-redirecturi="postmessage"
+                      data-accesstype="offline"
+                      data-cookiepolicy="single_host_origin"
+                      data-callback="signInCallback"
+                      data-approvalprompt="force">
+                </span>
+            </div>
+            <li><div class="navbar-text" id="result" style="display: none;"></div></li>
+        {% endif %}
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+<div class="row">
+    <div class="col-md-2">
+        <h3>Categories</h3>
+        <ul>
+            {% for category in category_summary %}
+                <li><a href="{{url_for('show_category', category_id=category.id)}}">{{category.name}}</a> ({{category.item_count}})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-offset-2">
+        {# Show errors, then success notifications. #}
+        {% with errors = get_flashed_messages(category_filter=['error']) %}
+            {% if errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for msg in errors %}
+                            <li>{{msg}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% with successes = get_flashed_messages(category_filter=['success']) %}
+            {% if successes %}
+                <div class="alert alert-success">
+                    <ul>
+                        {% for msg in successes %}
+                            <li>{{msg}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block main %}{% endblock %}
+    </div>
+</div>
+</div>
+
+</body>
+</html>

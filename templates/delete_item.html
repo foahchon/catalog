@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block main %}
+<form action="{{url_for('delete_item', item_id=item.id)}}" method="post">
+    <h1>Are you sure you want to delete "{{item.name}}"?</h1>
+    <input type="hidden" value="{{csrf_token}}" name="csrf_token" />
+    <button type="submit" class="btn btn-primary">Yes</button>
+    <a href="{{url_for('show_category', category_id=category_id)}}"><button type="button" class="btn btn-danger">No</button></a>
+</form>
+{% endblock %}
