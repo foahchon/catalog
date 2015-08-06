@@ -56,6 +56,7 @@ class CatalogItem(Base):
 
     image_blob = Column(Binary, nullable=True)
 
+    # Convert to dictionary for JSON/XML serialization.
     @property
     def serialize(self):
         return {
@@ -81,6 +82,7 @@ class Category(Base):
 
     items = relationship("CatalogItem", backref="category")
 
+    # Convert to dictionary for JSON/XML serialization.
     @property
     def serialize(self):
         return {
