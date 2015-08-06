@@ -1,3 +1,4 @@
+dict2xml
 oauth2client
 httplib2
 requests

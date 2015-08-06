@@ -56,6 +56,14 @@ class CatalogItem(Base):
 
     image_blob = Column(Binary, nullable=True)
 
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description
+        }
+
 
 class Category(Base):
     """Class for storing item categories.
@@ -73,6 +81,13 @@ class Category(Base):
 
     items = relationship("CatalogItem", backref="category")
 
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'items': [item.serialize for item in self.items]
+        }
 
 engine = create_engine('sqlite:///catalog.db')
 

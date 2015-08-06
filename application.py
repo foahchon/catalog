@@ -1,5 +1,8 @@
 import io
 
+# XML serialization library
+import dict2xml
+
 import httplib2
 import requests
 
@@ -18,7 +21,6 @@ from sqlalchemy.orm import sessionmaker
 
 # Application-specific helpers and libraries.
 from catalog_helpers import *
-from catalog_json_encoder import CatalogJSONEncoder
 from database_setup import Base, Category, CatalogItem
 
 app = Flask(__name__)
@@ -36,15 +38,29 @@ DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
 
+@app.route('/catalog.xml')
+def get_xml_catalog():
+    """Returns current catalog formatted to XML.
+    """
+
+    categories = db_session.query(Category).all()
+    root = {'category': [category.serialize for category in categories]}
+    xml = dict2xml.dict2xml(root, wrap="catalog", indent="  ")
+
+    response = make_response(xml)
+    response.headers['Content-Type'] = 'application/xml'
+
+    return response
+
+
 @app.route('/catalog.json')
 def get_json_catalog():
     """Returns current catalog formatted to JSON.
     """
-    catalog = db_session.query(Category).all()
 
-    # jsonify function will make use of CatalogJSONEncoder class
-    # (specified in app startup).
-    return jsonify(Catalog=catalog)
+    categories = db_session.query(Category).all()
+
+    return jsonify(catalog=[category.serialize for category in categories])
 
 
 @app.route('/static/<path:path>')
@@ -478,6 +494,5 @@ def logout():
 # Application startup
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
-    app.json_encoder = CatalogJSONEncoder
     app.debug = True
     app.run(host='0.0.0.0', port=5000)

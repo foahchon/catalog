@@ -8,6 +8,8 @@ from database_setup import CatalogItem, Category, User
 from user_profile import UserProfile
 
 
+# Token-related helpers
+
 def generate_token():
     """Generates and returns a 32-character token string.
     """
@@ -44,6 +46,8 @@ def get_csrf_token():
     return session.get('csrf_token')
 
 
+# User-related helpers
+
 def user_owns_item(item_id):
     """Checks to see if active user owns item with ID item_id.
 
@@ -62,23 +66,6 @@ def user_owns_item(item_id):
         return user.id == item.user_id
 
     return False
-
-
-def get_category_summary():
-    """Retrieves list of summary information for categories in database.
-    Fields include ID, name, and item count.
-
-    Returns:
-        List of summary category data.
-    """
-
-    categories = db_session \
-        .query(Category.id, Category.name,
-               func.count(CatalogItem.category_id).label('item_count')) \
-        .outerjoin(CatalogItem) \
-        .group_by(Category.id) \
-        .all()
-    return categories
 
 
 def create_user(login_session):
@@ -132,6 +119,27 @@ def get_current_user_profile():
 
     return UserProfile(logged_in=False)
 
+
+# Category helpers
+
+def get_category_summary():
+    """Retrieves list of summary information for categories in database.
+    Fields include ID, name, and item count.
+
+    Returns:
+        List of summary category data.
+    """
+
+    categories = db_session \
+        .query(Category.id, Category.name,
+               func.count(CatalogItem.category_id).label('item_count')) \
+        .outerjoin(CatalogItem) \
+        .group_by(Category.id) \
+        .all()
+    return categories
+
+
+# HTTP error helpers
 
 def item_not_found():
     """Returns 404 HTTP response with message "Item not found."

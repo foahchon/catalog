@@ -13,7 +13,6 @@ Small app that displays categories and items within those categories. Users who 
 ## What's Included
 - `application.py` - Main application
 - `catalog_helpers.py` - Assorted commonly-used functions for use with `application.py`
-- `catalog_json_encoder.py` - Class for converting catalog items into dictionaries for serialization with Python's `json` module.
 - `client_secrets.json` - File containing application keys for use with Google sign-in. This file will need to be edited or replaced before the application can be run properly (see [Application Configuration](#Application_Configuration_38)).
 - `database_setup.py` - Schema configuration for SqlAlchemy.
 - `requirements.txt` - List of requirements needed to run this application (see [Requirements](#Requirements_25)).
@@ -29,7 +28,7 @@ To install the dependencies needed to run this project, type the following in a 
 
 ## Seeding the Database
 
-To seed the database with categories, you will need to type the following into a console window:
+To seed the database with categories, type the following into a console window:
 
 `python seed_categories.py`
 
